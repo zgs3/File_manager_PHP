@@ -29,11 +29,15 @@ td {
 }
 
 .tableBlock {
-  /* width: 80%; */
   border: 2px solid black;
-  margin: auto;
+  margin: 1rem auto;
   background-color: white;
   border-radius: 7.5px;
+}
+
+button a {
+  padding: 1rem;
+  line-height: 1.5rem;
 }
 
 .actionsBlock {
@@ -44,4 +48,8 @@ td {
 #mainContainer {
   width: 80%;
   margin: 5rem auto 0 auto;
+}
+
+#backBtnDiv {
+  height: 2.5rem;
 }

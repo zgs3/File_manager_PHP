@@ -80,15 +80,26 @@ if (isset($_POST['downloadBtn'])) {
   exit;
 }
 
+// creating file or folder ---------- ---------- ---------- ---------- ----------
+if (isset($_POST['filename'])) {
+  if (str_contains($_POST['filename'], '.')) {
+    fopen($currentDir . '/' . $_POST['filename'], 'w');
+  } else {
+    if (!is_dir($_POST['filename'])) {
+      mkdir($currentDir . '/' . $_POST['filename']);
+    }
+  }
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File Manager</title>
   <style>
     <?php require 'C:\xampp\htdocs\file_manager_php\styles\styles.css' ?>
@@ -104,6 +115,15 @@ if (isset($_POST['downloadBtn'])) {
     echo ("<h1>" .  'Current directory: ' . ltrim($currentDir, '.') . "</h1>");
     ?>
 
+    <!-- BACK Button -->
+    <div id="backBtnDiv">
+      <button <?php (str_contains((dirname($parentDir) . '/'), 'file_manager_php'))
+                ? print("style = \"display: block\"")
+                : print("style = \"display: none\"") ?>>
+        <a class="backBtn" href="<?php echo (dirname($parentDir) . '/') ?>">BACK</a>
+      </button>
+    </div>
+
     <div class="tableBlock">
       <table>
         <tr class="tableHeaderRow">
@@ -112,10 +132,8 @@ if (isset($_POST['downloadBtn'])) {
           <th>Options</th>
         </tr>
         <?php
-
         // TABLE DISPLAYING FILES ---------- ---------- ---------- ----------
         $currentFiles = array_values(array_diff(scandir($currentDir), array('.', '..')));
-
         for ($i = 0; $i < count($currentFiles); $i++) {
           echo ("
               <tr>
@@ -124,9 +142,16 @@ if (isset($_POST['downloadBtn'])) {
                 <td class='actionsBlock'>" . returnDeleteBtn($currentDir, $currentFiles[$i]) . returnDownloadBtn($currentDir, $currentFiles[$i]) . "</td>
               </tr>"
           );
-        }
-        ?>
+        } ?>
       </table>
+    </div>
+
+    <!-- Creating new file -->
+    <div id="createBlock">
+      <form action="" method="post">
+        <input type="text" name="filename" placeholder="File name" maxlength="20"><br><br>
+        <input type="submit">
+      </form>
     </div>
 
   </div>
