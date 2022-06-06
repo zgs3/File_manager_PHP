@@ -53,3 +53,15 @@ button a {
 #backBtnDiv {
   height: 2.5rem;
 }
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 10rem;
+  padding: 0 5rem;
+  position: fixed;
+  bottom: 0;
+  background-color: gainsboro;
+  width: 100%;
+}

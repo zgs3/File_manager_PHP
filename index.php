@@ -59,9 +59,11 @@ function returnDownloadBtn($dir, $file)
   }
 }
 
+
 // Deleting files ---------- ---------- ---------- ---------- ----------
 if (isset($_POST['delBtn'])) {
   unlink($currentDir . "/" . $_POST['fileToDelete']);
+  header("Location: " . $_SERVER['REQUEST_URI']);
 }
 
 // downloading file ---------- ---------- ---------- ---------- ----------
@@ -84,11 +86,23 @@ if (isset($_POST['downloadBtn'])) {
 if (isset($_POST['filename'])) {
   if (str_contains($_POST['filename'], '.')) {
     fopen($currentDir . '/' . $_POST['filename'], 'w');
+    header("Location: " . $_SERVER['REQUEST_URI']);
   } else {
-    if (!is_dir($_POST['filename'])) {
-      mkdir($currentDir . '/' . $_POST['filename']);
-    }
+    mkdir($currentDir . '/' . $_POST['filename']);
+    header("Location: " . $_SERVER['REQUEST_URI']);
   }
+}
+
+// uploading files  ---------- ---------- ---------- ---------- ----------
+$uploadMsg = '';
+if (isset($_FILES['uploadedFile'])) {
+  $file_name = $_FILES['uploadedFile']['name'];
+  $file_size = $_FILES['uploadedFile']['size'];
+  $file_tmp = $_FILES['uploadedFile']['tmp_name'];
+  $file_type = $_FILES['uploadedFile']['type'];
+  move_uploaded_file($file_tmp, "./" . $currentDir . $file_name);
+  $uploadMsg = 'File uploaded succesfully!';
+  header("Location: " . $_SERVER['REQUEST_URI']);
 }
 
 ?>
@@ -145,16 +159,29 @@ if (isset($_POST['filename'])) {
         } ?>
       </table>
     </div>
+  </div>
 
+  <footer>
     <!-- Creating new file -->
     <div id="createBlock">
+      <h3>Create new file</h3>
+      <p>Add file extension at the end of the file name to create wanted file format. </p>
       <form action="" method="post">
         <input type="text" name="filename" placeholder="File name" maxlength="20"><br><br>
         <input type="submit">
       </form>
     </div>
+    
+    <div id="uploadBlock">
+      <h3>Upload new file</h3>
+      <form action="" method="POST" enctype="multipart/form-data">
+        <input type="file" name="uploadedFile" />
+        <input type="submit" />
+        <h4><?php echo $uploadMsg; ?></h4>
+      </form>
+    </div>
+  </footer>
 
-  </div>
 
 </body>
 
