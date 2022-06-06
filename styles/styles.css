@@ -4,12 +4,23 @@
   margin: 0;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem 0 2rem;
+  height: 2.5rem;
+  background-color: gainsboro;
+}
+
 table {
   width: 100%;
   border-spacing: 0;
 }
 
 th {
+  position: sticky;
+  top: 0;
   text-align: left;
   padding-left: .5rem;
   background: lightgrey;
@@ -28,16 +39,55 @@ td {
   padding-left: .5rem;
 }
 
+button a {
+  padding: 1rem;
+  line-height: 1.5rem;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 10rem;
+  padding: 0 5rem;
+  position: fixed;
+  bottom: 0;
+  background-color: gainsboro;
+  width: 100%;
+}
+
 .tableBlock {
   border: 2px solid black;
   margin: 1rem auto;
   background-color: white;
   border-radius: 7.5px;
+  overflow-y: auto;
+  max-height: 25rem;
 }
 
-button a {
-  padding: 1rem;
-  line-height: 1.5rem;
+.tableBlock::-webkit-scrollbar {
+  border: 1px solid black;
+  width: .5rem;
+}
+
+.tableBlock::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+.tableBlock::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.tableHeaderRow th:nth-child(1) {
+width: 20%;
+}
+
+.tableHeaderRow th:nth-child(2) {
+width: 70%;
+}
+
+.tableHeaderRow th:nth-child(3) {
+width: 10%;
 }
 
 .actionsBlock {
@@ -54,14 +104,22 @@ button a {
   height: 2.5rem;
 }
 
-footer {
+#loginForm {
+  width: 40%;
+  margin: 5rem auto;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  height: 10rem;
-  padding: 0 5rem;
-  position: fixed;
-  bottom: 0;
-  background-color: gainsboro;
-  width: 100%;
+  border: 2px solid black;
+  padding: 2rem;
+  text-align: center;
 }
+
+#loginForm form {
+  padding: 1rem;
+}
+
+#loginForm form input {
+  margin-bottom: .5rem;
+}
+
