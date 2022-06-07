@@ -12,6 +12,7 @@ session_start();
 if (isset($_GET['action']) and $_GET['action'] == 'logout') {
   session_destroy();
   session_start();
+  header("Location: http://localhost/file_manager_php/");
 }
 
 // login 
@@ -23,6 +24,9 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
     $_SESSION['username'] = $_POST['username'];
   } else {
     $loginMsg = 'Wrong username or password.';
+  }
+  if ($_SESSION['logged_in'] = true) {
+    header("Location: " . $_SERVER['REQUEST_URI']);
   }
 }
 
@@ -36,31 +40,47 @@ function returnFileType($file)
   }
 }
 
-// Checking file type. Returning file name or a path for directory opening
-function returnFile($dir, $file)
+// Checking file type. Returning file name or a path for directory opening. Adding icon depending on the file format
+function returnFileName($dir, $file)
 {
   if (is_dir($dir . $file)) {
     if (str_contains($dir . $file, ' ')) {
-      return ("<a href=?path=" . str_replace(' ', '%20', ltrim($dir, './')) . str_replace(' ', '%20', $file) . "/>" . $file . "</a>");
+      return ("<i class='fa-solid fa-folder-open'></i>" . " " . "<a href=?path=" . str_replace(' ', '%20', ltrim($dir, './')) . str_replace(' ', '%20', $file) . "/>" . $file . "</a>");
     } else {
-      return ("<a href=?path=" . ltrim($dir, './') . $file . "/>" . $file . "</a>");
+      return ("<i class='fa-solid fa-folder-open'></i>" . " " . "<a href=?path=" . ltrim($dir, './') . $file . "/>" . $file . "</a>");
     }
   } else {
-    return $file;
+    if (preg_match("/[\.][tT][xX][tT$]/", $file) == 1) {
+      return ("<i class='fa-solid fa-file-lines'></i>" . " " . $file);
+    } else if (
+      (preg_match("/[\.][jJ][pP][gG$]/", $file) == 1) ||
+      (preg_match("/[\.][jJ][pP][eE][gG$]/", $file) == 1) ||
+      (preg_match("/[\.][pP][nN][gG$]/", $file) == 1)
+    ) {
+      return ("<i class='fa-solid fa-file-image'></i>" . " " . $file);
+    } else if (
+      (preg_match("/[\.][gG][iI][fF$]/", $file) == 1) ||
+      (preg_match("/[\.][wW][mM][aA$]/", $file) == 1) ||
+      (preg_match("/[\.][mM][pP][3-5$]/", $file) == 1)
+    ) {
+      return ("<i class='fa-solid fa-photo-film'></i>" . " " . $file);
+    } else {
+      return ("<i class='fa-solid fa-file'></i>" . " " . $file);
+    }
   }
 }
 
-// Returning delete button for files, but not folders ---------- ---------- 
+// Returning delete button for files, but not folders 
 function returnDeleteBtn($dir, $file)
 {
   if (is_file($dir . $file) && $file !== 'index.php' && $file !== 'styles.css') {
     return ("<form action='' method=POST>
                 <input type='hidden' name='fileToDelete' value='" . $file . "' >
-                <input type='submit' name='delBtn' value='DELETE' >
+                <button type='submit' name='delBtn'><i class='fa-solid fa-trash-can'></i></button>
               </form>"
     );
   } else {
-    return (' - - - - - - - ');
+    return ('-');
   }
 }
 
@@ -70,14 +90,13 @@ function returnDownloadBtn($dir, $file)
   if (is_file($dir . $file) && $file !== 'index.php' && $file !== 'styles.css') {
     return ("<form action='' method=POST>
                 <input type='hidden' name='fileToDownload' value='" . $file . "' >
-                <input type='submit' name='downloadBtn' value='Download' >
+                <button type='submit' name='downloadBtn'><i class='fa-solid fa-download'></i></button>
               </form>"
     );
   } else {
-    return (' - - - - - - - ');
+    return ('-');
   }
 }
-
 
 // Deleting files ---------- ---------- ---------- ---------- ----------
 if (isset($_POST['delBtn'])) {
@@ -102,7 +121,11 @@ if (isset($_POST['downloadBtn'])) {
 }
 
 // creating file or folder ---------- ---------- ---------- ---------- ----------
-if (isset($_POST['filename'])) {
+$fileArr = array_values(array_diff(scandir($currentDir), array('.', '..')));
+$fileCreateErrorMsg = '';
+if (isset($_POST['filename']) && in_array($_POST['filename'], $fileArr)) {
+  $fileCreateErrorMsg = 'File name already exist!';
+} else if (isset($_POST['filename'])) {
   if (str_contains($_POST['filename'], '.')) {
     fopen($currentDir . '/' . $_POST['filename'], 'w');
     header("Location: " . $_SERVER['REQUEST_URI']);
@@ -112,15 +135,17 @@ if (isset($_POST['filename'])) {
   }
 }
 
+
 // uploading files  ---------- ---------- ---------- ---------- ----------
 $uploadMsg = '';
-if (isset($_FILES['uploadedFile'])) {
+if (isset($_FILES['uploadedFile']) && in_array($_FILES['uploadedFile']['name'], $fileArr)) {
+  $uploadMsg = 'File already exist!';
+} else if ((isset($_FILES['uploadedFile']))) {
   $file_name = $_FILES['uploadedFile']['name'];
   $file_size = $_FILES['uploadedFile']['size'];
   $file_tmp = $_FILES['uploadedFile']['tmp_name'];
   $file_type = $_FILES['uploadedFile']['type'];
   move_uploaded_file($file_tmp, "./" . $currentDir . $file_name);
-  $uploadMsg = 'File uploaded succesfully!';
   header("Location: " . $_SERVER['REQUEST_URI']);
 }
 
@@ -132,7 +157,7 @@ function returnFileSize($dir, $file)
     return (number_format($sizeInMB, 2) . ' MB'
     );
   } else {
-    return (' - - - - - - - ');
+    return ('-');
   }
 }
 
@@ -146,6 +171,7 @@ function returnFileSize($dir, $file)
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File Manager</title>
+  <script src="https://kit.fontawesome.com/8cc9ee3dc9.js" crossorigin="anonymous"></script>
   <style>
     <?php require 'C:\xampp\htdocs\file_manager_php\styles\styles.css' ?>
   </style>
@@ -166,7 +192,7 @@ function returnFileSize($dir, $file)
     </div>
     <div>
       <button>
-        <a href="index.php?action=logout"> Logout</a>
+        <a href="index.php?action=logout"> <i class="fa-solid fa-power-off"></i></a>
       </button>
     </div>
   </header>
@@ -200,7 +226,7 @@ function returnFileSize($dir, $file)
       <button <?php (str_contains((dirname($parentDir) . '/'), 'file_manager_php'))
                 ? print("style = \"display: block\"")
                 : print("style = \"display: none\"") ?>>
-        <a class="backBtn" href="<?php echo (dirname($parentDir) . '/') ?>">BACK</a>
+        <a class="backBtn" href="<?php echo (dirname($parentDir) . '/') ?>"><i class="fa-solid fa-circle-left"></i></a>
       </button>
     </div>
 
@@ -218,7 +244,7 @@ function returnFileSize($dir, $file)
           echo ("
               <tr>
                 <td>" . returnFileType($currentDir . $currentFiles[$i]) . "</td>
-                <td>" . returnFile($currentDir, $currentFiles[$i]) . "</td>
+                <td>" . returnFileName($currentDir, $currentFiles[$i]) . "</td>
                 <td>" . returnFileSize($currentDir, $currentFiles[$i]) . "</td>
                 <td class='actionsBlock'>" . returnDeleteBtn($currentDir, $currentFiles[$i]) . returnDownloadBtn($currentDir, $currentFiles[$i]) . "</td>
               </tr>"
@@ -239,6 +265,9 @@ function returnFileSize($dir, $file)
         <input type="text" name="filename" placeholder="File name" maxlength="20"><br><br>
         <input type="submit">
       </form>
+      <div>
+        <?php print($fileCreateErrorMsg) ?>
+      </div>
     </div>
 
     <div id="uploadBlock">
