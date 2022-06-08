@@ -9,10 +9,11 @@ if (isset($_GET['path'])) {
 
 session_start();
 // logout 
-if (isset($_GET['action']) and $_GET['action'] == 'logout') {
+if (isset($_POST['logOut'])) {
   session_destroy();
   session_start();
-  header("Location: http://localhost/file_manager_php/");
+  header('Location: ' . rtrim($_SERVER['PHP_SELF'], 'index.php'));
+  exit;
 }
 
 // login 
@@ -22,11 +23,10 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
     $_SESSION['logged_in'] = true;
     $_SESSION['timeout'] = time();
     $_SESSION['username'] = $_POST['username'];
+    header("Location: " . $_SERVER['REQUEST_URI']);
+    exit;
   } else {
     $loginMsg = 'Wrong username or password.';
-  }
-  if ($_SESSION['logged_in'] = true) {
-    header("Location: " . $_SERVER['REQUEST_URI']);
   }
 }
 
@@ -45,27 +45,30 @@ function returnFileName($dir, $file)
 {
   if (is_dir($dir . $file)) {
     if (str_contains($dir . $file, ' ')) {
-      return ("<i class='fa-solid fa-folder-open'></i>" . " " . "<a href=?path=" . str_replace(' ', '%20', ltrim($dir, './')) . str_replace(' ', '%20', $file) . "/>" . $file . "</a>");
+      return ("<div class='icon'><i class='fa-solid fa-folder-open'></i>" . "<a href=?path=" . str_replace(' ', '%20', ltrim($dir, './')) .
+        str_replace(' ', '%20', $file) . "/>" . $file . "</a>" . "</div>");
     } else {
-      return ("<i class='fa-solid fa-folder-open'></i>" . " " . "<a href=?path=" . ltrim($dir, './') . $file . "/>" . $file . "</a>");
+      return ("<div class='icon'><i class='fa-solid fa-folder-open'></i>" . "<a href=?path=" .
+        ltrim($dir, './') . $file . "/>" . $file . "</a>" . "</div>");
     }
   } else {
     if (preg_match("/[\.][tT][xX][tT$]/", $file) == 1) {
-      return ("<i class='fa-solid fa-file-lines'></i>" . " " . $file);
+      return ("<div class='icon'><i class='fa-solid fa-file-lines'></i>" . $file . "</div>");
     } else if (
       (preg_match("/[\.][jJ][pP][gG$]/", $file) == 1) ||
       (preg_match("/[\.][jJ][pP][eE][gG$]/", $file) == 1) ||
-      (preg_match("/[\.][pP][nN][gG$]/", $file) == 1)
+      (preg_match("/[\.][pP][nN][gG$]/", $file) == 1) ||
+      (preg_match("/[\.][wW][eE][bB][pP$]/", $file) == 1)
     ) {
-      return ("<i class='fa-solid fa-file-image'></i>" . " " . $file);
+      return ("<div class='icon'><i class='fa-solid fa-file-image'></i>" . $file . "</div>");
     } else if (
       (preg_match("/[\.][gG][iI][fF$]/", $file) == 1) ||
       (preg_match("/[\.][wW][mM][aA$]/", $file) == 1) ||
       (preg_match("/[\.][mM][pP][3-5$]/", $file) == 1)
     ) {
-      return ("<i class='fa-solid fa-photo-film'></i>" . " " . $file);
+      return ("<div class='icon'><i class='fa-solid fa-photo-film'></i>" . $file . "</div>");
     } else {
-      return ("<i class='fa-solid fa-file'></i>" . " " . $file);
+      return ("<div class='icon'><i class='fa-solid fa-file'></i>" . $file . "</div>");
     }
   }
 }
@@ -76,35 +79,40 @@ function returnDeleteBtn($dir, $file)
   if (is_file($dir . $file) && $file !== 'index.php' && $file !== 'styles.css') {
     return ("<form action='' method=POST>
                 <input type='hidden' name='fileToDelete' value='" . $file . "' >
-                <button type='submit' name='delBtn'><i class='fa-solid fa-trash-can'></i></button>
+                <button type='submit' name='delBtn' class='actionBtn' title='Delete file'>
+                  <i class='fa-solid fa-trash-can'></i>
+                </button>
               </form>"
     );
   } else {
-    return ('-');
+    return ('- ');
   }
 }
 
-// checking if target is file or folder, returning download button ---------- ---------- 
+// checking if target is file or folder, returning download button 
 function returnDownloadBtn($dir, $file)
 {
   if (is_file($dir . $file) && $file !== 'index.php' && $file !== 'styles.css') {
     return ("<form action='' method=POST>
                 <input type='hidden' name='fileToDownload' value='" . $file . "' >
-                <button type='submit' name='downloadBtn'><i class='fa-solid fa-download'></i></button>
+                <button type='submit' name='downloadBtn' class='actionBtn' title='Download file'>
+                  <i class='fa-solid fa-download'></i>
+                </button>
               </form>"
     );
   } else {
-    return ('-');
+    return ('- ');
   }
 }
 
-// Deleting files ---------- ---------- ---------- ---------- ----------
+// Deleting files 
 if (isset($_POST['delBtn'])) {
   unlink($currentDir . "/" . $_POST['fileToDelete']);
   header("Location: " . $_SERVER['REQUEST_URI']);
+  exit;
 }
 
-// downloading file ---------- ---------- ---------- ---------- ----------
+// downloading file 
 if (isset($_POST['downloadBtn'])) {
   $file = './' . $_GET["path"] . $_POST['fileToDownload'];
   $fileToDownloadEscaped = str_replace("&nbsp;", " ", htmlentities($file, 3, 'utf-8'));
@@ -120,7 +128,7 @@ if (isset($_POST['downloadBtn'])) {
   exit;
 }
 
-// creating file or folder ---------- ---------- ---------- ---------- ----------
+// creating file or folder 
 $fileArr = array_values(array_diff(scandir($currentDir), array('.', '..')));
 $fileCreateErrorMsg = '';
 if (isset($_POST['filename']) && in_array($_POST['filename'], $fileArr)) {
@@ -129,17 +137,18 @@ if (isset($_POST['filename']) && in_array($_POST['filename'], $fileArr)) {
   if (str_contains($_POST['filename'], '.')) {
     fopen($currentDir . '/' . $_POST['filename'], 'w');
     header("Location: " . $_SERVER['REQUEST_URI']);
+    exit;
   } else {
     mkdir($currentDir . '/' . $_POST['filename']);
     header("Location: " . $_SERVER['REQUEST_URI']);
+    exit;
   }
 }
 
-
-// uploading files  ---------- ---------- ---------- ---------- ----------
-$uploadMsg = '';
+// uploading files 
+$uploadErrorMsg = '';
 if (isset($_FILES['uploadedFile']) && in_array($_FILES['uploadedFile']['name'], $fileArr)) {
-  $uploadMsg = 'File already exist!';
+  $uploadErrorMsg = 'File already exist!';
 } else if ((isset($_FILES['uploadedFile']))) {
   $file_name = $_FILES['uploadedFile']['name'];
   $file_size = $_FILES['uploadedFile']['size'];
@@ -147,6 +156,7 @@ if (isset($_FILES['uploadedFile']) && in_array($_FILES['uploadedFile']['name'], 
   $file_type = $_FILES['uploadedFile']['type'];
   move_uploaded_file($file_tmp, "./" . $currentDir . $file_name);
   header("Location: " . $_SERVER['REQUEST_URI']);
+  exit;
 }
 
 // returning file size in mb
@@ -154,15 +164,13 @@ function returnFileSize($dir, $file)
 {
   if (is_file($dir . $file) && $file !== 'index.php' && $file !== 'styles.css') {
     $sizeInMB = (filesize($dir . $file)) / 1000000;
-    return (number_format($sizeInMB, 2) . ' MB'
-    );
+    return (number_format($sizeInMB, 2) . ' MB');
   } else {
-    return ('-');
+    return ('- -');
   }
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -178,7 +186,6 @@ function returnFileSize($dir, $file)
 </head>
 
 <body>
-
   <header <?php isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true
             ? print("style = \"display: flex\"")
             : print("style = \"display: none\"") ?>>
@@ -186,17 +193,17 @@ function returnFileSize($dir, $file)
       <?php
       if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
         print('<h2>' . 'Welcome back, ' . $_SESSION['username'] . '!' . '</h2>');
-      } else {
-        NULL;
-      } ?>
+      }?>
     </div>
     <div>
-      <button>
-        <a href="index.php?action=logout"> <i class="fa-solid fa-power-off"></i></a>
-      </button>
+      <form action="" method="POST">
+        <!-- <input type="submit" value="Log out" /> -->
+        <button type="submit" name="logOut" title="Log out" id="logOutBtn">
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+        </button>
+      </form>
     </div>
   </header>
-
   <!-- Login form -->
   <div id="loginForm" <?php isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true
                         ? print("style = \"display: none\"")
@@ -207,29 +214,26 @@ function returnFileSize($dir, $file)
                                     : print("style = \"display: block\"") ?>>
       <input type="text" name="username" placeholder="username = User" required autofocus></br>
       <input type="password" name="password" placeholder="password = 12345" required><br>
-      <button type="submit" name="login">Login</button>
+      <button type="submit" name="login">LOG IN</button>
       <h4><?php echo ($loginMsg); ?></h4>
     </form>
   </div>
-
   <div id="mainContainer" <?php isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true
                             ? print("style = \"display: block\"")
                             : print("style = \"display: none\"") ?>>
 
     <?php
-    // SHOW CURRENT PATH ---------- ---------- ---------- ----------
+    // SHOW CURRENT PATH 
     echo ("<h1>" .  'Current directory: ' . ltrim($currentDir, '.') . "</h1>");
     ?>
-
     <!-- BACK Button -->
     <div id="backBtnDiv">
-      <button <?php (str_contains((dirname($parentDir) . '/'), 'file_manager_php'))
-                ? print("style = \"display: block\"")
-                : print("style = \"display: none\"") ?>>
+      <button title="Go back" <?php (!str_contains((dirname($parentDir) . '/'), 'file_manager_php'))
+                                ? print("style = \"display: none\"")
+                                : print("style = \"display: block\"") ?>>
         <a class="backBtn" href="<?php echo (dirname($parentDir) . '/') ?>"><i class="fa-solid fa-circle-left"></i></a>
       </button>
     </div>
-
     <div class="tableBlock">
       <table>
         <tr class="tableHeaderRow">
@@ -252,35 +256,43 @@ function returnFileSize($dir, $file)
         } ?>
       </table>
     </div>
+    <!-- Returning error message if trying to duplicate existing files -->
+    <div id="errorMsgDiv">
+      <p id="errorMsg">
+        <?php
+        print($fileCreateErrorMsg);
+        print($uploadErrorMsg) ?>
+      </p>
+    </div>
   </div>
-
   <footer <?php isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true
             ? print("style = \"display: flex\"")
             : print("style = \"display: none\"") ?>>
     <!-- Creating new file -->
-    <div id="createBlock">
+    <div>
       <h3>Create new file</h3>
-      <p>Add file extension at the end of the file name to create wanted file format. </p>
       <form action="" method="post">
-        <input type="text" name="filename" placeholder="File name" maxlength="20"><br><br>
-        <input type="submit">
+        <input type="text" name="filename" placeholder="File name" maxlength="20">
+        <button type="submit" value="Create file" class="formBtn">Create file</button>
       </form>
-      <div>
-        <?php print($fileCreateErrorMsg) ?>
-      </div>
+      <p>Add file extension at the end of the file name to create wanted file format. </p>
     </div>
-
     <div id="uploadBlock">
       <h3>Upload new file</h3>
-      <form action="" method="POST" enctype="multipart/form-data">
-        <input type="file" name="uploadedFile" />
-        <input type="submit" />
-        <h4><?php echo $uploadMsg; ?></h4>
+      <form action="" method="POST" id="uploadForm" enctype="multipart/form-data">
+        <div class="uploadFormDiv">
+          <input type="button" class="uploadBtn" value="Choose file"></input>
+          <input type="file" name="uploadedFile" />
+        </div>
       </form>
     </div>
   </footer>
-
-
+  <script type="text/javascript">
+    // Auto submitting the form after selecting the file
+    document.getElementById("uploadForm").onchange = function() {
+      document.getElementById("uploadForm").submit();
+    };
+  </script>
 </body>
 
 </html>
