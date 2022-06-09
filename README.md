@@ -2,7 +2,7 @@
 
 * Application which allows the user to browse and manage files in computer local directory. The app simply serves as a file manager application.
 
-![App screnshot](/repository/assets/application_screenshot?raw=true "Screenshot of the app")
+![application_screenshot](https://user-images.githubusercontent.com/97868964/172853331-748b69ff-2f57-4610-b099-459e0a45acf5.jpg)
 
 * Project was done as a Sprint 6 task while I was studying at Baltic Institute of Technology. 
 
@@ -26,7 +26,7 @@ Note that the app name in the URL must be the same as the directory name where "
 
   Password: 12345
 
-![Login screnshot](/repository/assets/login_screenshot?raw=true "Screenshot of the login table")
+![login_screenshot](https://user-images.githubusercontent.com/97868964/172853554-ed25ade0-9bd9-40df-8816-3d12b91e809b.jpg)
 
 
 ## Description
