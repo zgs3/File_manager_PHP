@@ -26,7 +26,7 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
     header("Location: " . $_SERVER['REQUEST_URI']);
     exit;
   } else {
-    $loginMsg = 'Wrong username or password.';
+    $loginMsg = 'Wrong Username or Password.';
   }
 }
 
@@ -133,6 +133,8 @@ $fileArr = array_values(array_diff(scandir($currentDir), array('.', '..')));
 $fileCreateErrorMsg = '';
 if (isset($_POST['filename']) && in_array($_POST['filename'], $fileArr)) {
   $fileCreateErrorMsg = 'File name already exist!';
+} else if (isset($_POST['filename']) && str_starts_with($_POST['filename'], ' ') || isset($_POST['filename']) && str_starts_with($_POST['filename'], '.')) {
+  $fileCreateErrorMsg = 'File name is not valid. Please enter a valid file name.';
 } else if (isset($_POST['filename'])) {
   if (str_contains($_POST['filename'], '.')) {
     fopen($currentDir . '/' . $_POST['filename'], 'w');
@@ -193,7 +195,7 @@ function returnFileSize($dir, $file)
       <?php
       if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
         print('<h2>' . 'Welcome back, ' . $_SESSION['username'] . '!' . '</h2>');
-      }?>
+      } ?>
     </div>
     <div>
       <form action="" method="POST">
