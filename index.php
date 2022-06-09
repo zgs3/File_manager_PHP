@@ -84,10 +84,20 @@ function returnDeleteBtn($dir, $file)
                 </button>
               </form>"
     );
-  } else {
+  } else if (is_dir($dir . $file)) {
+    $currentDirFiles = array_values(array_diff(scandir($dir . $file), array('.', '..')));
+    if (count($currentDirFiles) == 0) {
+      return ("<form action='' method=POST>
+                <input type='hidden' name='dirToDelete' value='" . $file . "' >
+                <button type='submit' name='dirDelBtn' class='actionBtn' title='Delete directory'>
+                  <i class='fa-solid fa-trash-can'></i>
+                </button>
+              </form>"
+      );
+    } else {
     return ('- ');
   }
-}
+}}
 
 // checking if target is file or folder, returning download button 
 function returnDownloadBtn($dir, $file)
@@ -108,6 +118,13 @@ function returnDownloadBtn($dir, $file)
 // Deleting files 
 if (isset($_POST['delBtn'])) {
   unlink($currentDir . "/" . $_POST['fileToDelete']);
+  header("Location: " . $_SERVER['REQUEST_URI']);
+  exit;
+}
+
+// Deleting directory 
+if (isset($_POST['dirDelBtn'])) {
+  rmdir($currentDir . "/" . $_POST['dirToDelete']);
   header("Location: " . $_SERVER['REQUEST_URI']);
   exit;
 }
@@ -180,6 +197,7 @@ function returnFileSize($dir, $file)
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./assets/folder.png" />
   <title>File Manager</title>
   <script src="https://kit.fontawesome.com/8cc9ee3dc9.js" crossorigin="anonymous"></script>
   <style>
