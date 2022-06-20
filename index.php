@@ -201,7 +201,7 @@ function returnFileSize($dir, $file)
   <title>File Manager</title>
   <script src="https://kit.fontawesome.com/8cc9ee3dc9.js" crossorigin="anonymous"></script>
   <style>
-    <?php require 'C:\xampp\htdocs\file_manager_php\styles\styles.css' ?>
+    <?php require './styles/styles.css' ?>
   </style>
 </head>
 
@@ -217,7 +217,6 @@ function returnFileSize($dir, $file)
     </div>
     <div>
       <form action="" method="POST">
-        <!-- <input type="submit" value="Log out" /> -->
         <button type="submit" name="logOut" title="Log out" id="logOutBtn">
           <i class="fa-solid fa-person-walking-arrow-right"></i>
         </button>
