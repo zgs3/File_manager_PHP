@@ -2,13 +2,13 @@
 
 * Application which allows the user to browse and manage files in computer local directory. The app simply serves as a file manager application.
 
-![application_screenshot](https://user-images.githubusercontent.com/97868964/172853331-748b69ff-2f57-4610-b099-459e0a45acf5.jpg)
+![filemanager](https://user-images.githubusercontent.com/97868964/174842360-bee1ccf8-bdae-4b7d-bed8-8d90e1e94030.png)
 
 * Project was done as a Sprint 6 task while I was studying at Baltic Institute of Technology. 
 
 ## Getting Started
 
-* To be able to use the app, you must first have "Apache" server application like "XAMPP" or similar web server app. You can find more info about "XAMPP" [here](https://www.apachefriends.org/)
+* To be able to use the app, you must first have "Apache" server application like "XAMPP" or similar web server app. You can find more info about "XAMPP" [here](https://www.apachefriends.org/).
 
 If you are using XAMPP:
 
@@ -63,4 +63,4 @@ Added FontAwesome icons.
 
 Project made by me - Žygimantas Kairaitis. 
 
-Find me on [LinkedIn](https://www.linkedin.com/in/%C5%BEygimantas-kairaitis-018a86193/)
+Find me on [LinkedIn](https://www.linkedin.com/in/%C5%BEygimantas-kairaitis-018a86193/).
